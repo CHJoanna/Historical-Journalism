@@ -304,7 +304,6 @@ def registerG():
       return render_template('registerG.html', error=error)
   
     return redirect(url_for('signinG'))
-
   return render_template('registerG.html', error=error)
 
 @app.route('/login')
