@@ -65,6 +65,10 @@
 					{% endfor %}
 					</ul>
 				{% endfor %} 
+			<form method="GET" action="/remove">
+	    		<input name="list_name" value="{{ t[0] }}" style="display:none">
+	    		<input type="submit" value="Remove Whole List">
+			</form>			
 			</div>
 			{% endfor %}
 		</div>

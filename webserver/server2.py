@@ -243,7 +243,6 @@ def signin():
       watchlist = cur3
       cred = True
       session['acc'] = cursor.first()[0]
-      watch()
       return render_template('signin.html', watchlist = watchlist, news = news, cred = cred, search = search, news_id = n['news_id'])
   return render_template('signin.html', error=error)
 
@@ -420,6 +419,17 @@ def delete():
   cursor.close() 
   return render_template('delete_success.html')
 
+@app.route('/remove', methods=['GET', 'POST'])
+def remove():
+  usr_account = session['acc']
+  list_name = request.args.get('list_name')
+  #try:
+  cursor = g.conn.execute("DELETE FROM watchlist_own WHERE list_name=%s AND account=%s", (list_name, usr_account))
+  #except Exception as e:
+  #  return render_template('error.html')
+
+  cursor.close() 
+  return render_template('delete_success.html')
 
 @app.route('/add_existing', methods=['GET', 'POST'])
 def add_existing():
@@ -434,9 +444,18 @@ def add_existing():
   cursor.close() 
   return render_template('add_success.html')
 
-@app.route('/add_new', methods=['GET'])
+@app.route('/add_new', methods=['GET', 'POST'])
 def add_new():
-  return render_template('watchlist.html')
+  usr_account = session['acc']
+  news_id = request.args.get('news_id')
+  list_name = request.args.get('list_name');
+  try:
+    cursor = g.conn.execute("INSERT into watchlist_own(account, list_name) values (%s, %s)", (usr_account, list_name))
+    cursor2 = g.conn.execute("INSERT into add(news_id, list_name, account) values (%s, %s, %s)", (news_id, list_name, usr_account))
+  except Exception as e:
+    return render_template('error.html')
+
+  return render_template('add_success.html')
 
 if __name__ == "__main__":
   import click
