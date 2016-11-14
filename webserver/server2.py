@@ -410,6 +410,7 @@ def add_existing():
   usr_account = session['acc']
   query = request.args.get('query')
   news_id = request.args.get('news_id')
+  print news_id
   #CHECK SAFE QUERY
   cursor = g.conn.execute("INSERT into add(news_id, list_name, account) values (%s, %s, %s)", (news_id, query, usr_account))
   rows = cursor.fetchall()
@@ -417,8 +418,13 @@ def add_existing():
   
   return render_template('add_success.html')
 
-@app.route('/add_new', methods=['GET'])
+@app.route('/add_new', methods=['GET', 'POST'])
 def add_new():
+  usr_account = session['acc']
+  list_title = request.form['list_name']
+  news_id = request.args.get('news_id')
+  print news_id
+  cursor = g.conn.execute("INSERT into watchlist_own(account, list_name) values (%s, %s)", (usr_account, list_title))
   return render_template('watchlist.html')
 
 if __name__ == "__main__":

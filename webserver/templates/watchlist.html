@@ -34,7 +34,8 @@
 			<td><input type="text" name="list_name" placeholder="watchlist name"></td>
 		</tr>	
 	</table> 
-			<input type="submit" value="Add"></td>		
+			<input type="submit" value="Add"></td>
+			<input name="news_id" value="{{ request.args.get('news_id') }}" style="display:none">		
 	</form>
 	</div>
 	<p><a href = "{{url_for('search')}}"> Search</a></p>
