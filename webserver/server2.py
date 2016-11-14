@@ -244,7 +244,7 @@ def signin():
       cred = True
       session['acc'] = cursor.first()[0]
       watch()
-      return render_template('signin.html', watchlist = watchlist, news = news, cred = cred, search = search)
+      return render_template('signin.html', watchlist = watchlist, news = news, cred = cred, search = search, news_id = n['news_id'])
   return render_template('signin.html', error=error)
 
 
@@ -399,10 +399,26 @@ def populate_watchlist():
 
   cursor = g.conn.execute("SELECT DISTINCT list_name FROM Users AS u, watchlist_own AS w \
                         WHERE u.account = w.account and u.account = %s", usr_account)
-  rows = cursor.fetchall()
+  rows = []
+  for result in cursor:
+    rows.append(result[0])
   cursor.close() 
 
+
   return render_template('watchlist.html', watchlist_own = rows)
+
+@app.route('/delete', methods=['GET', 'POST'])
+def delete():
+  usr_account = session['acc']
+  list_name = request.args.get('list_name')
+  news_id = request.args.get('news_id')
+  #try:
+  cursor = g.conn.execute("DELETE FROM add WHERE news_id=%s AND list_name=%s AND account=%s", (news_id, list_name, usr_account))
+  #except Exception as e:
+  #  return render_template('error.html')
+
+  cursor.close() 
+  return render_template('delete_success.html')
 
 
 @app.route('/add_existing', methods=['GET', 'POST'])
@@ -410,21 +426,16 @@ def add_existing():
   usr_account = session['acc']
   query = request.args.get('query')
   news_id = request.args.get('news_id')
-  print news_id
-  #CHECK SAFE QUERY
-  cursor = g.conn.execute("INSERT into add(news_id, list_name, account) values (%s, %s, %s)", (news_id, query, usr_account))
-  rows = cursor.fetchall()
+  try:
+    cursor = g.conn.execute("INSERT into add(news_id, list_name, account) values (%s, %s, %s)", (news_id, query, usr_account))
+  except Exception as e:
+    return render_template('error.html')
+
   cursor.close() 
-  
   return render_template('add_success.html')
 
-@app.route('/add_new', methods=['GET', 'POST'])
+@app.route('/add_new', methods=['GET'])
 def add_new():
-  usr_account = session['acc']
-  list_title = request.form['list_name']
-  news_id = request.args.get('news_id')
-  print news_id
-  cursor = g.conn.execute("INSERT into watchlist_own(account, list_name) values (%s, %s)", (usr_account, list_title))
   return render_template('watchlist.html')
 
 if __name__ == "__main__":
